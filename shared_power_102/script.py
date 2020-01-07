@@ -302,7 +302,28 @@ class Distributer(Index , HomePage, Registration, Tools):
 		elif ACTION[0] == '5':
 			print(SESSION)
 
+class Delivery(Tools, Invoice, Registration):
 
+	def __init__(self):
+		super().__init__()
+		self.total_deliveries = 6
+		self.available = 6
+		if self.out_of_valley:
+			self.delivery_open = True
+		self.delivery_open = False
+		
+	def delivery(self):
+		if self.delivery_open and bool(self.available):
+			self.available -= 1
+	
+	def update_invoice():
+		pass
+
+class Insurance(Tools, Registration):
+
+	def __init__(self):
+		super().__init__()
+		pass
 
 i = HomePage()
 print(i.show())

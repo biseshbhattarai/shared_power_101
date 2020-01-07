@@ -1,31 +1,23 @@
-
+#! /usr/bin/python3
+from script import HomePage
 #Implementing screen feature ... 
-class HomeScreen:
+class HomeScreen(HomePage):
 
-    def __init__(self):
-
-		self.feat = []
-		
-
-	def show(self):
-		return "Welcome to shared power\n\n\n\n -----------------------------\n"
-
-	def options(self):
-		self.feat = ['Register', 'Login']
-		j = 0
-		while j<= 1:
-			print("{} : ({})".format(self.feat[j], j))
-			j += 1
+	def __init__(self):
+		super().__init__()
+	
+	def run():
+		print(self.show())
+		self.options()
+		self.getAction()
 
 
-	def getAction(self, selected=False):
-		s = input("Please enter the action : ")
-		ACTION.append(s)
-		while not bool(ACTION):
-			print("Please give the action index..")
-			s= input("Please enter the action : ")
-		print(ACTION)
 
+class LoginScreen:
+	pass
+
+class RegisterScreen():
+	pass
 
 class ProfileScreen:
 	pass
