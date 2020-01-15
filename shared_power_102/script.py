@@ -1,7 +1,7 @@
 #! /usr/bin/python3
 
 #PROJECT STATUS
-
+    
 '''
 COMPLETED:
 	1> Register
@@ -14,11 +14,9 @@ import sqlite3
 import sys
 conn = sqlite3.connect('user.db')
 c = conn.cursor()
-FEATS = ['Register', 'Login', 'View&Search', 'View Cart', 'Add Tool', 'Logout']
 global d
 SESSION = []
-ACTION = []
-SYSTEM_ON = False
+
 #DATABASE INITIALIZATION
 #--------------------------------------------------------------------------------------
 class LoginPage:
@@ -108,6 +106,8 @@ class DashBoard:
         title_label.pack()
         gappp = Label(window)
         gappp.pack(pady=7)
+        cart_button = Button(window, text="View cart" , command=lambda:cart_page(window))
+        cart_button.pack()
         search_entry = Entry(window)
         search_entry.insert(0, 'Search here...')
         search_entry.pack()
@@ -146,6 +146,7 @@ def add_tool_page():
     a = AddToolPage()
 
 
+
 class Db:
     def __init__(self):
      
@@ -173,12 +174,23 @@ class Db:
         except Exception as e:
             print(e)
         try:
-            c.execute(  """CREATE TABLE invoices(
+            c.execute( """CREATE TABLE invoices(
                 description text,
                 quantity integer,
                 price integer,
                 total integer
             )""")
+        except Exception:
+            pass
+        try:
+            c.execute("""
+                CREATE TABLE cart(
+                    username text, 
+                    tool_name text,
+                    FOREIGN KEY (user_name_) REFERENCES users(user_name)
+                    FOREIGN KEY (tool_name) REFERENCES tools(tool_name)
+                    )
+            """)
         except Exception as e:
             print(e)
 
@@ -231,6 +243,8 @@ class Db:
             print("Tools added")
             window.destroy()
             #GOTODASHBOARD
+
+    
 d = Db()
 
 class Hire:
@@ -258,6 +272,9 @@ class Hire:
         full_day_rate.grid(row=2, column=1)
         owner = Label(window, text=a[0][4])
         owner.grid(row=3 , column=1)
+        add_to_cart_button = Button(window, text="Add to cart" , 
+        command=lambda : t.add_to_cart(tool_name, owner, window))
+        add_to_cart_button.grid(row=4, column=4)
         window.mainloop()
         
 
@@ -280,8 +297,34 @@ class Tools:
             print("No such items")
     # def get_one_tool()
     
+    def add_to_cart(self , tool_name, username, window):
+        window.destroy()
+        c.execute("""INSERT INTO cart VALUES(? , ? )""", (username , tool_name))
+        conn.commit()
+        print("Added to cart")
+        show_dashboard()
+
+def get_cart_data():
+    c.execute("""SELECT * FROM cart WHERE username=?""", (SESSION[0],))
+    return c.fetchall()
+
+
+class CartPage:
+
+    def __init__(self):
+        window = Tk()
+        window.geometry("300x500")
+        cart_data = get_cart_data()
+        for i in cart_data:
+            label = Label(window, text=i)
+            label.pack()
+        button = Button(window ,text="Back", command=lambda: show_dashboard())
 t = Tools()
 
+#cart page
+def cart_page(window):
+    window.destroy()
+    c = CartPage()
 
 
 #----------------------------------------------------------------------------------------------------------------
