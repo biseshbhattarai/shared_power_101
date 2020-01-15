@@ -7,6 +7,9 @@ COMPLETED:
 	1> Register
 	2> Login
 	3> Add
+    4> Add to cart
+    3> Dashboard page
+    
 
 '''
 from tkinter import *
@@ -14,7 +17,6 @@ import sqlite3
 import sys
 conn = sqlite3.connect('user.db')
 c = conn.cursor()
-global d
 SESSION = []
 
 #DATABASE INITIALIZATION
@@ -108,6 +110,8 @@ class DashBoard:
         gappp.pack(pady=7)
         cart_button = Button(window, text="View cart" , command=lambda:cart_page(window))
         cart_button.pack()
+        my_tools = Button(window, text="My Tools", command=lambda:my_tools_page(window))
+        my_tools.pack()
         search_entry = Entry(window)
         search_entry.insert(0, 'Search here...')
         search_entry.pack()
@@ -131,7 +135,21 @@ class DashBoard:
                 counter2 += 1
                 # print(counter1, counter2)
                 
-              
+class MyToolsPage:
+
+    def __init__(self):
+        window = Tk()
+        window.geometry("300x500")
+        c.execute("""SELECT * FROM tools WHERE user_name=?""",(SESSION[0],))
+        a = c.fetchall()
+        for i in a:
+            label = Label(window, text=i)
+            label.pack()
+        back_button = Button(window, text="Back", command=lambda:show_dashboard_(window))             
+        back_button.pack()
+def my_tools_page(window):
+    window.destroy()
+    m = MyToolsPage()
 
 def login_page():
     a = LoginPage()
@@ -144,6 +162,9 @@ def show_dashboard():
     c = DashBoard()
 def add_tool_page():
     a = AddToolPage()
+def show_dashboard_(window):
+    window.destroy()
+    c = DashBoard()
 
 
 
@@ -187,7 +208,7 @@ class Db:
                 CREATE TABLE cart(
                     username text, 
                     tool_name text,
-                    FOREIGN KEY (user_name_) REFERENCES users(user_name)
+                    FOREIGN KEY (username) REFERENCES users(username)
                     FOREIGN KEY (tool_name) REFERENCES tools(tool_name)
                     )
             """)
@@ -273,8 +294,8 @@ class Hire:
         owner = Label(window, text=a[0][4])
         owner.grid(row=3 , column=1)
         add_to_cart_button = Button(window, text="Add to cart" , 
-        command=lambda : t.add_to_cart(tool_name, owner, window))
-        add_to_cart_button.grid(row=4, column=4)
+        command=lambda : t.add_to_cart(tool_name, SESSION[0], window))
+        add_to_cart_button.grid(row=4, column=3)
         window.mainloop()
         
 
@@ -300,13 +321,22 @@ class Tools:
     def add_to_cart(self , tool_name, username, window):
         window.destroy()
         c.execute("""INSERT INTO cart VALUES(? , ? )""", (username , tool_name))
-        conn.commit()
+        c.commit()
         print("Added to cart")
         show_dashboard()
+
+    #HERE WE"LL UPDATE THE INVOICE 
+    def hire_tools(self, cart_data, window):
+        for i in cart_data:
+            print("{} are hired".format(i))
+        window.destroy()
+        show_dashboard()
+
 
 def get_cart_data():
     c.execute("""SELECT * FROM cart WHERE username=?""", (SESSION[0],))
     return c.fetchall()
+t = Tools()
 
 
 class CartPage:
@@ -316,10 +346,13 @@ class CartPage:
         window.geometry("300x500")
         cart_data = get_cart_data()
         for i in cart_data:
-            label = Label(window, text=i)
+            label = Label(window, text=i[1])
             label.pack()
-        button = Button(window ,text="Back", command=lambda: show_dashboard())
-t = Tools()
+        hire_button = Button(window, text="Hire" , command=lambda : t.hire_tools(cart_data, window))    
+        button = Button(window ,text="Back", command=lambda: show_dashboard_(window))
+        button.pack()
+
+#CALLING TOOL INSTANCE
 
 #cart page
 def cart_page(window):
