@@ -3,7 +3,6 @@
 #PROJECT STATUS
 from tkinter import *
 import sqlite3
-import sys
 from tkinter import messagebox as msg
 import datetime
 conn = sqlite3.connect('user.db')
@@ -16,54 +15,59 @@ class LoginPage:
 
     def __init__(self):
         window = Tk()
-        window.geometry('300x500')
-        username_label = Label(window, text="Username : ")
-        username_label.grid(row=0, column=0)
+        window.configure(background="black")
+        window.geometry('500x600')
+        Label(text="LOGIN", font=30,background="black", fg="skyblue").pack(pady=30)
+
+        username_label = Label(window, text="Username : ", background="black", fg="green",font=20)
+        username_label.pack()
         username_entry = Entry(window)
-        username_entry.grid(row=0, column=1)
-        password_label = Label(window, text="Password : ")
-        password_label.grid(row=1, column=0)
+        username_entry.pack()
+        password_label = Label(window, text="Password : ", background="black", fg="green",font=20)
+        password_label.pack()
         password_entry = Entry(window)
-        password_entry.grid(row=1, column=1)
-        login_button = Button(text="Login", command=lambda : d.login(username_entry.get(), password_entry.get(), window))
-        login_button.grid(sticky='nsew')
-        gap = Label(window)
-        gap.grid(pady=10)
-        down_text = Label(window, text="Not registered yet ? ")
-        down_text.grid(sticky='nsew')
-        down_text_button = Button(text="Register", command=lambda : show_register_page(True, window))
-        down_text_button.grid(sticky='nsew')
+        password_entry.pack(pady=12)
+        login_button = Button(text="Login", bg="lightblue",fg="black",command=lambda : d.login(username_entry.get(), password_entry.get(), window))
+        login_button.pack()
+       
+        down_text = Label(window, text="Not registered yet ? ", background="black", font=20)
+        down_text.pack()
+        down_text_button = Button(text="Register", bg="lightblue",fg="black",command=lambda : show_register_page(True, window))
+        down_text_button.pack()
         window.mainloop()
 
 class RegisterPage():
 
     def __init__(self):
         window = Tk()
-        window.geometry('300x500')
-        username_label = Label(window, text="Username : ")
-        username_label.grid(row=0, column=0)
-        username_entry = Entry(window)
-        username_entry.grid(row=0, column=1)
-        password_label = Label(window, text="Password : ")
-        password_label.grid(row=1, column=0)
+        window.configure(bg="black")
+        window.geometry('500x600')
+        Label(text="REGISTER", font=30,background="black", fg="skyblue").pack(pady=10)
+
+        username_label = Label(window, text="Username : " , background="black", font=12)
+        username_label.pack()
+        username_entry = Entry(window) 
+        username_entry.pack()
+        password_label = Label(window, text="Password : " , background="black", font=12)
+        password_label.pack()
         password_entry = Entry(window, show='*')
-        password_entry.grid(row=1, column=1)
-        email_label = Label(window, text="Email : ")
-        email_label.grid(row=2, column=0)
+        password_entry.pack()
+        email_label = Label(window, text="Email : ", background="black", font=12)
+        email_label.pack()
         email_entry = Entry(window)
-        email_entry.grid(row=2, column=1)
-        address_label = Label(window, text="Address : ")
-        address_label.grid(row=3, column=0)
+        email_entry.pack()
+        address_label = Label(window, text="Address : " , background="black", font=12)
+        address_label.pack()
         address_entry = Entry(window)
-        address_entry.grid(row=3, column=1)
-        phoneno_label = Label(window, text="Phone-no : ")
-        phoneno_label.grid(row=4, column=0)
+        address_entry.pack()
+        phoneno_label = Label(window, text="Phone-no : ", background="black", font=12)
+        phoneno_label.pack()
         phoneno_entry = Entry(window)
-        phoneno_entry.grid(row=4, column=1) 
-        register_button = Button(text="Register", command=lambda : d.register(username_entry.get(), password_entry.get(), email_entry.get(), address_entry.get(), phoneno_entry.get(), window))
-        register_button.grid(row=6 , column=2)
-        back = Button(text="Back", command=lambda:back_login(window))
-        back.grid(row=8, column=2)
+        phoneno_entry.pack(pady=20) 
+        register_button = Button(text="Register", bg="skyblue", fg="black", command=lambda : d.register(username_entry.get(), password_entry.get(), email_entry.get(), address_entry.get(), phoneno_entry.get(), window))
+        register_button.pack()
+        back = Button(text="Back", bg="skyblue", fg="black" ,command=lambda:back_login(window))
+        back.pack()
         window.mainloop()
 
 class AddToolPage():
@@ -94,54 +98,78 @@ class AddToolPage():
            
 def check(s):
     print(s)
+
 class DashBoard:
 
     def __init__(self):
         window = Tk()
-        scrollbar = Scrollbar(window)
-        scrollbar.pack(side=RIGHT, fill=Y)
-        scrollbar.pack(side=RIGHT, fill=Y)
-        listbox = Listbox(window, yscrollcommand=scrollbar.set)
-        window.geometry("300x500")
-        title_label = Label(window, text="Welcome "+ SESSION[0].upper()+ " to your dashboard")
-        title_label.pack()
-        gappp = Label(window)
-        gappp.pack(pady=7)
-        cart_button = Button(window, text="View cart" , command=lambda:cart_page(window))
-        cart_button.pack()
-        my_tools = Button(window, text="My Tools", command=lambda:my_tools_page(window))
-        my_tools.pack()
+        self.hirings = []
+        window.configure(bg="black")
+        window.geometry("500x600")
+        Label(window, font=30, bg="black", fg="yellow",text="WELCOME "+ SESSION[0] + " to your dashboard.").pack(pady=20)
+        search_label = Label(window, bg="black", fg="green", text="Search tool", font=20)
+        search_label.pack()
         search_entry = Entry(window)
-        search_entry.insert(0, 'Search here...')
         search_entry.pack()
-        search_submit = Button(window, text="Submit", command=lambda : t.view_and_hire(search_entry.get(), window))
-        search_submit.pack(pady=15)
-        Label(window, text="AVAILABLE TOOLS").pack(pady=12)
-
+        search_button = Button(window, bg="green", fg="black", text="Search", font=40, command=lambda:t.view_and_hire(search_entry.get(), window))
+        search_button.pack(pady=10)
+        view_cart_button = Button(window, bg="green" ,fg="black",text="View Cart" , font=40,  
+        command=lambda: cart_page(window))
+        view_cart_button.pack(pady=10)
+        hired_tool_button = Button(window, bg="green", fg="black" ,text="Hired tools", font=40, 
+        command=lambda:my_tools_page(window))
+        hired_tool_button.pack(pady=10)
+        scrollbar = Scrollbar(window)
+        scrollbar.pack()
+        self.listbox = Listbox(window, yscrollcommand=scrollbar.set)
+        self.listbox.bind('<<ListboxSelect>>', self.curSec)
+        self.listbox.configure(font=15)
         s =  t.get_tools(SESSION[0])
-       
-        print(len(s))
-
         for i in s:
-           listbox.insert(END, i[0])
-        listbox.pack(side=LEFT, fill=BOTH)
-        scrollbar.config(command=listbox.yview)
+            self.listbox.insert(END, i[0])
+        self.listbox.pack()
+        Button(window, text="Hire", bg="green", fg="black", font=40, command=lambda:t.confirm_hire(self.hirings, window)).pack()
+
+
         window.mainloop()
+        
+    def curSec(self, event):
+        value = (self.listbox.get(self.listbox.curselection()))
+        print(value)
+        self.hirings.append((SESSION[0],value, datetime.datetime.now().strftime("%Y%m%d")))
+        # self.listbox.itemconfig(value, fg="yellow")
+
 
                 
 class MyToolsPage:
 
     def __init__(self):
         window = Tk()
-        window.geometry("300x500")
+        self.returned = []
+        window.configure(bg="black")
+        window.geometry("500x600")
         c.execute("""SELECT * FROM hirings WHERE username=?""",(SESSION[0],))
         a = c.fetchall()
+        Label(window, text="HIRED TOOLS" , font="50", bg="black", fg="green").pack(pady=20)
+        scrollbar = Scrollbar(window)
+        scrollbar.pack()
+        self.listbox = Listbox(window, yscrollcommand=scrollbar.set)
+        self.listbox.bind('<<ListboxSelect>>', self.curSec)
+        self.listbox.configure(font=30, fg="green", bg="black")
+        
         for i in a:
-            label = Label(window, text=i)
-            label.pack()
-        back_button = Button(window, text="Back", command=lambda:show_dashboard_(window))             
+            self.listbox.insert(END, i[1])
+        self.listbox.pack()
+        Button(window, bg="skyblue" , fg="black",font=40,text="Return", command=lambda:print(self.returned)).pack()
+        back_button = Button(window, text="Back", bg="skyblue",font=40,fg="black",command=lambda:show_dashboard_(window))             
         back_button.pack()
+
+    def curSec(self, event):
+        value = self.listbox.get(self.listbox.curselection())
+        self.returned.append(value)
+
 def my_tools_page(window):
+
     window.destroy()
     m = MyToolsPage()
 
@@ -187,6 +215,7 @@ class Db:
             full_day_rate integer,
             description text,
             user_name text,
+            image text,
             FOREIGN KEY(user_name) REFERENCES users(username)
             )""")
         except Exception as e:
@@ -279,7 +308,6 @@ class Db:
             msg.showinfo('Success', 'Tool is added')
             window.destroy()
             #GOTODASHBOARD
-
     
 d = Db()
 
@@ -287,36 +315,38 @@ class Hire:
 
     def __init__(self, tool_name, s):
         window = Tk()
-        window.geometry("300x500")
+        window.configure(bg="black")
+        window.geometry("500x600")
         # label = Label(window, text=tool_name)
         # label.grid(row=0, column=0)
         c.execute("""SELECT * FROM tools WHERE tool_name=?""", (tool_name,))
         a = c.fetchall()
-        description_label = Label(window , text='Description : ')
-        description_label.grid(row=0, column=0)
-        half_day_rate_label = Label(window, text='Half day rate : ')
-        half_day_rate_label.grid(row=1, column=0)
-        full_day_rate_label = Label(window, text='Full day rate : ')
-        full_day_rate_label.grid(row=2, column=0)
-        owner_label = Label(window, text='Owner : ')
-        owner_label.grid(row=3 , column=0)
-        description = Label(window , text=a[0][1])
-        description.grid(row=0, column=1)
-        half_day_rate = Label(window, text=a[0][2])
-        half_day_rate.grid(row=1, column=1)
-        full_day_rate = Label(window, text=a[0][3])
-        full_day_rate.grid(row=2, column=1)
-        owner = Label(window, text=a[0][4])
-        owner.grid(row=3 , column=1)
-        add_to_cart_button = Button(window, text="Add to cart" , 
+        description_label = Label(window , text='Description -> ', bg="black", font=20)
+        description_label.grid(row=3, column=0)
+        half_day_rate_label = Label(window, text='Half day rate -> ', bg="black", font=20)
+        half_day_rate_label.grid(row=4, column=0)
+        full_day_rate_label = Label(window, text='Full day rate -> ', bg="black", font=20)
+        full_day_rate_label.grid(row=5, column=0)
+        owner_label = Label(window, text='Owner -> ', bg="black", font=20)
+        owner_label.grid(row=6 , column=0)
+        description = Label(window , text=a[0][1], bg="black", font=20)
+        description.grid(row=3, column=1)
+        half_day_rate = Label(window, text=a[0][2], bg="black", font=20)
+        half_day_rate.grid(row=4, column=1)
+        full_day_rate = Label(window, text=a[0][3], bg="black", font=20)
+        full_day_rate.grid(row=5, column=1)
+        owner = Label(window, text=a[0][4], bg="black", font=20)
+        owner.grid(row=6 , column=1)
+        add_to_cart_button = Button(window, bg="skyblue",fg="black",font=40,text="Add to cart" , 
         command=lambda : t.add_to_cart(tool_name, SESSION[0], window))
         add_to_cart_button.grid(row=4, column=3)
         data = []
         data.append((SESSION[0], tool_name, datetime.datetime.now().strftime("%Y%m%d")))
-        hire_button = Button(window, text="Hire", command=lambda: t.confirm_hire(data, window))
+        hire_button = Button(window, text="Hire", bg="skyblue",fg="black",font=40,command=lambda: t.confirm_hire(data, window))
         hire_button.grid(row=5, column=3)
         window.mainloop()
-        
+
+       
 
 def hireandviewPage(tool_name, window, s):
     window.destroy()
@@ -358,12 +388,14 @@ class Tools:
                 c.execute("""INSERT INTO hirings VALUES(?, ?, ?, ? , ?)""", (i[0], i[1], 
                 datetime.datetime.now().strftime("%Y%m%d"), quantity , s))
                 conn.commit()
+                c.execute("""DELETE FROM cart WHERE username=? and tool_name=?""", (SESSION[0],i[1]))
+                conn.commit()
         else:
             print("{} is hired".format(cart_data))
             c.execute("""INSERT INTO hirings VALUES (?, ?, ? , ? , ?)""", (cart_data[0][0], cart_data[0][1], 
         datetime.datetime.now().strftime("%Y%m%d"), quantity, s))
             conn.commit()
-        c.execute("""DELETE FROM cart WHERE username=?""", (SESSION[0], ))
+        c.execute("""DELETE FROM cart WHERE username=? and tool_name=?""", (SESSION[0], cart_data[0][1]))
         conn.commit()
         msg.showinfo('showinfo ', 'Above item/s are hired')
         print("Cart data of {} is deleted".format(SESSION[0]))
@@ -403,9 +435,22 @@ class Tools:
             s.append(i[1]+"\t"+i[2]+"\t"+i[3]+"\t"+total_fine+"\t"+ext)
         return s
 
-    def return_tools(self):
+    def return_tools(tools, self):
+        hirings = []
+        for i in tools:
+            c.execute("""SELECT * FROM hirings WHERE tool_name=? and username=? """, (i, SESSION[0]))
+            a = c.fetchall()
+            c.execute("""SELECT * FROM tools WHERE tool_name=?""", (i))
+            b = c.fetchall()
+            half_day_rate = b[0][1]
+            full_day_rate = b[0][2]
+            hiringgg.append((i, full_day_rate, a[0][3], full_day_rate*a[0][3]))
+        for i in hirings:
+            c.execute("""INSERT INTO INVOICE VALUES (?, ? , ?, ?)""", (i[0], i[1], i[2], i[3]))
+            conn.commit()
         a = self.generate_invoice()
         view_invoice_page(a , window)
+        pass
 
 
 
@@ -419,15 +464,16 @@ class CartPage:
 
     def __init__(self):
         window = Tk()
-        window.geometry("300x500")
+        window.configure(bg="black")
+        window.geometry("500x600")
         cart_data = get_cart_data()
         for i in cart_data:
-            label = Label(window, text=i[1])
-            label.pack()
+            label = Label(window, text="-->"+i[1], bg="black", fg="yellow" ,font=50)
+            label.pack(pady=22)
         if len(cart_data) != 0:
-            hire_button = Button(window, text="Hire" , command=lambda : t.confirm_hire(cart_data, window))    
-            hire_button.pack()
-        button = Button(window ,text="Back", command=lambda: show_dashboard_(window))
+            hire_button = Button(window, text="Hire" , bg="skyblue", fg="black", font=40,command=lambda : t.confirm_hire(cart_data, window))    
+            hire_button.pack(pady=10)
+        button = Button(window ,text="Back", bg="skyblue",fg="black",command=lambda: show_dashboard_(window))
         button.pack()
 
 class Invoice:
