@@ -158,10 +158,10 @@ class DashBoard:
             self.listbox.insert(END, i[0])
         self.listbox.place(x=450, y=300)
         Button(window, text="Hire", bg="green", fg="black", font=40, command=lambda:t.confirm_hire(self.hirings, window)).place(x=535, y=620)
-        Button(window, text="Hire", bg="green", fg="black", font=40, 
+        Button(window, text="Claim Insurance", bg="green", fg="black", font=40, 
         command=lambda:t.insurance(self.hirings, window)).place(x=600, y=620)
-        Button(window, text="Hire", bg="green", fg="black", font=40, command=lambda:t.insurance(self.hirings, window)).place(x=700, y=620)
-        window.mainloop()
+        Button(window, text="Logout", bg="green", fg="black", font=40, command=lambda:d.logout(window)).place(x=700, y=620)
+        window.mainloop()s
 
   
     def curSec(self, event):
@@ -345,6 +345,10 @@ class Db:
             show_dashboard()
         else:
             msg.showerror('Error' , 'Empty fields')
+
+    def logout(self, window):
+        SESSION.pop()
+        login_page()
     
 d = Db()
 
