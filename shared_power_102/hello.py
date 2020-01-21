@@ -1,12 +1,37 @@
-from tkinter.ttk import *
-from tkinter import *
+import sqlite3
+conn = sqlite3.connect('user.db')
+c = conn.cursor()
 
-root = Tk()
-tree = ttk.Treeview(root)
-tree["columns"] = ("one", "two", "three")
-tree.column("#0", width=270, minwidth=270, stretch=NO)
-tree.column("one", width=150, minwidth=150, stretch=NO)
-tree.column("two", width=400, minwidth=200)
-tree.column("#0", width=400, minwidth=50, stretch=NO)
-# tree.column("#0", width=270, minwidth=270, stretch=tk.NO)
-root.mainloop()
+c.execute( """CREATE TABLE invoices(
+        username text,
+        description text,
+        quantity integer,
+        price integer,
+        delivery integer, 
+        insurance integer,
+        fine integer,
+        total integer
+    )""")
+
+
+c.execute("""
+        CREATE TABLE cart(
+            username text, 
+            tool_name text,
+            FOREIGN KEY (username) REFERENCES users(username)
+            FOREIGN KEY (tool_name) REFERENCES tools(tool_name)
+            )
+    """)
+
+c.execute("""
+            CREATE TABLE hirings(
+                username text,
+                tool_name text,
+                hired_date timestamp,
+                quantity integer,
+                delivery integer,
+                FOREIGN KEY(username) REFERENCES users(username),
+                FOREIGN KEY (tool_name) REFERENCES tools(tool_name)
+                
+            )
+""")

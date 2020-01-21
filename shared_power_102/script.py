@@ -7,7 +7,7 @@ from tkinter import messagebox as msg
 import datetime
 from PIL import ImageTk, Image
 from tkinter import ttk 
-
+import time
 
 conn = sqlite3.connect('user.db')
 c = conn.cursor()
@@ -16,9 +16,12 @@ SESSION = []
 
 #DATABASE INITIALIZATION
 #--------------------------------------------------------------------------------------
+
+
 class LoginPage:
 
     def __init__(self):
+        
         window = Tk()
         window.geometry("1100x600+100+50")
         window.configure()
@@ -147,6 +150,8 @@ class DashBoard:
         self.viewbutton.place(x=400, y=170)
         self.viewbutton_ = Button(window, text="View Hired tools", bg="green",command=lambda: my_tools_page(window))
         self.viewbutton_.place(x=600, y=170)
+        self.showinvoice_ = Button(window, text="View Invoice", fg="black", bg="yellow",command=lambda: t.view_invoice_page(window))
+        self.showinvoice_.place(x=800, y=170)
       
         scrollbar = Scrollbar(window)
         scrollbar.pack(side=RIGHT, fill=Y)
@@ -160,8 +165,8 @@ class DashBoard:
         Button(window, text="Hire", bg="green", fg="black", font=40, command=lambda:t.confirm_hire(self.hirings, window)).place(x=535, y=620)
         Button(window, text="Claim Insurance", bg="green", fg="black", font=40, 
         command=lambda:t.insurance(self.hirings, window)).place(x=600, y=620)
-        Button(window, text="Logout", bg="green", fg="black", font=40, command=lambda:d.logout(window)).place(x=700, y=620)
-        window.mainloop()s
+        Button(window, text="Logout", bg="green", fg="black", font=40, command=lambda:d.logout(window)).place(x=800, y=620)
+        window.mainloop()
 
   
     def curSec(self, event):
@@ -348,7 +353,7 @@ class Db:
 
     def logout(self, window):
         SESSION.pop()
-        login_page()
+        back_login(window)
     
 d = Db()
 
@@ -399,8 +404,11 @@ def hireandviewPage(tool_name, window, s):
 class Tools:
 
     def get_tools(self, username):
-        c.execute("""SELECT * FROM tools WHERE user_name != ? and availabilty=?""", (username,'True'))
-        return c.fetchall()
+        c.execute("""SELECT * FROM tools WHERE user_name != ? and availability=?""", (username,'True'))
+        a = c.fetchall()
+        if len(a) == 0:
+            msg.showinfo("Info", "No tools are available now")
+        return a 
 
     def view_and_hire(self, tool_name, window):
         c.execute("""SELECT * FROM tools WHERE tool_name == ?""", (tool_name,))
@@ -456,7 +464,8 @@ class Tools:
         window.geometry("1000x1200")
         img = Image.open('tool1.jpeg')
         background_image = ImageTk.PhotoImage(image=img)
-        Label(window, image=background_image).place(x=0, y=0)
+        l = Label(window, image=background_image)
+        l.place(x=0, y=0)
         quantity_label = Label(window, bg="black", fg="green" ,font=("Arial", 25),text="Quantity")
         quantity_label.pack(pady=7)
         quantity = Entry(window ,cursor='dot', bd=1, width=27, font=("Arial", 30) )
@@ -465,17 +474,17 @@ class Tools:
         delivery = IntVar()
         delivery_opt = Checkbutton(window, font=("Arial", 30),variable=delivery , text="Request for delivery")
         delivery_opt.pack()
-        # price = t.get_price(tool_name)
         Button(window, text="Confirm" , command=lambda: t.hire_tools(data, quantity.get(),delivery.get(), window)).pack()
-        # t.hire_tools(data, quantity.get(), delivery_opt.get(), window)
+    
      
 
-    def view_invoice_page(self):
-        c.execute("""SELECT * FROM invoice WHERE username=? """, (username, ))
+    def view_invoice_page(self, window):
+        window.destroy()
+        c.execute("""SELECT * FROM invoices WHERE username=? """, (SESSION[0], ))
         invoices = c.fetchall()
-        print(invoices)   
+        i = Invoice(invoices)   
 
-    def return_tools(self, tools):
+    def return_tools(self, tools, window):
         fine = 0
         hiringgg = []
         for i in tools:
@@ -500,15 +509,23 @@ class Tools:
             hiringgg.append((i, full_day_rate, a[0][3], delivery , 5, fine , full_day_rate*a[0][3]+delivery+fine))
             print(hiringgg)
         for i in hiringgg:
-            c.execute("""INSERT INTO invoices VALUES (?, ? , ?, ?, ?, ?)""", (i[0], i[1], i[2], i[3],i[5], i[6]))
+            print(len(i))
+            print(i)
+            c.execute("""INSERT INTO invoices VALUES (?, ? , ?, ?, ?, ?, ?,?)""", (SESSION[0],i[0], i[2], i[1], i[3],i[4], i[5],i[6]))
+            conn.commit()
+            c.execute('DELETE FROM hirings WHERE tool_name=? and username=?', (i[0], SESSION[0]))
             conn.commit()
         # a = self.generate_invoice()
-        t.view_invoice_page(a)
+        window.destroy()
+        show_dashboard()
         
     def insurance(self, tools_name, window):
+        print(tools_name)
         #UPDATE AVAILABILTY TO FALSE
         for i in tools_name:
-            c.execute("""UPDATE tools SET availability=? WHERE user_name=? and tool_name=?""",(SESSION[0], i))
+            print(i[0], i[1])
+            s = 'False'
+            c.execute("""UPDATE tools SET availability=? WHERE tool_name=?""",(s, i[1]))
             conn.commit()
             show_dashboard_(window)
 
@@ -526,7 +543,8 @@ class CartPage:
         window.geometry("800x900")
         img = Image.open('tool1.jpeg')
         background_image = ImageTk.PhotoImage(img)
-        Label(window, image=background_image).place(x=0, y=0)
+        l = Label(window, image=background_image)
+        l.place(x=0, y=0)
         cart_data = get_cart_data()
         for i in cart_data:
             label = Label(window, text="-->"+i[1], bg="black", fg="yellow" ,font=50)
@@ -542,23 +560,23 @@ class Invoice:
     def __init__(self, data):
         window = Tk()
         # window.config(bg="black")
+        window.geometry("1000x1200")
         img = Image.open('tool1.jpeg')
         background_image = ImageTk.PhotoImage(img)
-        Label(window, image=background_image).place(x=0, y=0)
-        window.geometry("500x600")
+        a = Label(window, image=background_image)
+        a.place(x=0, y=0)
+        window.geometry("1000x1200")
         window.title('Invoice')
-        Label(window, text="Description", font=("Arial", 20)).pack()
-        Label(window, text="Hammer", font=("Arial", 20)).pack(pady=10)
-        Label(window, text="Price", font=("Arial", 20)).pack()
-        Label(window, text="400", font=("Arial", 20)).pack(pady=10)
-        Label(window, text="Quantity", font=("Arial", 20)).pack()
-        Label(window, text="1", font=("Arial", 20)).pack(pady=10)
-        Label(window, text="Total", font=("Arial", 20)).pack()
-        Label(window, text="400", font=("Arial", 20)).pack(pady=10)
-        Label(window, text="Delivery", font=("Arial", 20)).pack()
-        Label(window, text="0", font=("Arial", 20)).pack(pady=10)
-        Label(window, text="Insurance", font=("Arial", 20)).pack()
-        Label(window, text="5", font=("Arial", 20)).pack(pady=10)
+        for i in data:
+            Label(window, text="Description    " + " --> " +i[1], bg="green", font=("Arial", 20)).pack(pady=2)
+            Label(window, text="Quantity       "+ "-->" +str(i[2]), bg="green", font=("Arial", 20)).pack(pady=2)
+            Label(window, text="Price         "+ "-->" +str(i[3]), bg="green",font=("Arial", 20)).pack(pady=2)
+            Label(window, text="Delivery      "+ "-->" +str(i[4]), bg="green",font=("Arial", 20)).pack(pady=2)
+            Label(window, text="Insurance     "+ "-->" +str(i[5]), bg="green",font=("Arial", 20)).pack(pady=2)
+            Label(window, text="Fine          "+ "-->" +str(i[6]), bg="green",font=("Arial", 20)).pack(pady=2)
+            Label(window, text="Total         "+ "-->" +str(i[7]), bg="green",font=("Arial", 20)).pack(pady=2)
+            Label(window, text="---------------------------").pack(pady=15)
+        Button(window, font=30, text="<-Back", fg="black", bg="green", command=lambda:show_dashboard_(window)).pack()
         window.mainloop()
 
 #CALLING TOOL INSTANCE
