@@ -1,12 +1,12 @@
+from tkinter.ttk import *
 from tkinter import *
-from PIL import ImageTk
-# import PIL
 
 root = Tk()
-root.geometry('1000x1000')
-image = ImageTk.PhotoImage()
-print(image)
-print(type(image))
-label = Label(root, image=image)
-label.place(x=0, y=0)
+tree = ttk.Treeview(root)
+tree["columns"] = ("one", "two", "three")
+tree.column("#0", width=270, minwidth=270, stretch=NO)
+tree.column("one", width=150, minwidth=150, stretch=NO)
+tree.column("two", width=400, minwidth=200)
+tree.column("#0", width=400, minwidth=50, stretch=NO)
+# tree.column("#0", width=270, minwidth=270, stretch=tk.NO)
 root.mainloop()

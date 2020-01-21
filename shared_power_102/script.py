@@ -5,6 +5,10 @@ from tkinter import *
 import sqlite3
 from tkinter import messagebox as msg
 import datetime
+from PIL import ImageTk, Image
+from tkinter import ttk 
+
+
 conn = sqlite3.connect('user.db')
 c = conn.cursor()
 SESSION = []
@@ -17,28 +21,32 @@ class LoginPage:
     def __init__(self):
         window = Tk()
         window.geometry("1100x600+100+50")
-        window.configure(bg="black")
+        window.configure()
         window.resizable(0, 0)
         # window.configure(background="black")
-        background_image = PhotoImage('tool1.jpg')
+        img = Image.open('tool1.jpeg')
+        background_image = ImageTk.PhotoImage(img)
+        s = Label(window, image=background_image)
+        s.place(x=0, y=0)
         print(type(background_image))
         # Label(text="LOGIN", font=30,background="black", fg="skyblue").pack(pady=30)
         # background_label = Label(window, image=background_image)
         # background_label.place(x=0, y=0, relwidth=1, relheight=1)
-        username_label = Label(window, font=("Arial", 25),text="Username : ", background="black", fg="green")
-        username_label.pack()
+        Label(window).pack(pady=20)
+        username_label = Label(window, font=("Arial", 25),text="Username : ", background="brown", fg="white")
+        username_label.pack(pady=10)
         username_entry = Entry(window ,cursor='dot', bd=1, width=27, font=("Arial", 30))
         username_entry.pack()
-        password_label = Label(window, font=("Arial", 25),text="Password : ", background="black", fg="green")
-        password_label.pack()
-        password_entry = Entry(window, cursor='dot', bd=1, width=27, font=("Arial", 30))
+        password_label = Label(window, font=("Arial", 25),text="Password : ", background="brown", fg="white")
+        password_label.pack(pady=10)
+        password_entry = Entry(window, cursor='dot', bd=1, width=27, font=("Arial", 30), show="*")
         password_entry.pack(pady=12)
-        login_button = Button(text="Login", bg="green",font=("Arial",20),fg="black",command=lambda : d.login(username_entry.get(), password_entry.get(), window))
+        login_button = Button(text="Login", bg="green",font=("Arial",20),fg="white",command=lambda : d.login(username_entry.get(), password_entry.get(), window))
         login_button.pack(pady=10)
        
         down_text = Label(window, text="Not registered yet ? ", background="black", font=20)
-        down_text.pack()
-        down_text_button = Button(text="Register", font=("Arial", 20), bg="green",fg="black",command=lambda : show_register_page(True, window))
+        down_text.pack(pady=10)
+        down_text_button = Button(text="Register", font=("Arial", 20), bg="green",fg="white",command=lambda : show_register_page(True, window))
         down_text_button.pack()
         window.mainloop()
 
@@ -47,32 +55,36 @@ class RegisterPage():
     def __init__(self):
         window = Tk()
         window.configure(bg="black")
-        window.geometry("1100x600+100+50")
-        window.configure(bg="black")
+        window.geometry("800x900")
+        # window.configure(bg="black")
+        img = Image.open('tool1.jpeg')
+        background_image = ImageTk.PhotoImage(img)
+        s = Label(window, image=background_image)
+        s.place(x=0, y=0)
         # window.resizable(0, 0)
         Label(text="REGISTER", font=30,background="black", fg="green").pack(pady=10)
 
-        username_label = Label(window, text="Username : " , fg="green",background="black", font=("Arial", 30))
+        username_label = Label(window, text="Username : " , fg="white",background="brown", font=("Arial", 30))
         username_label.pack()
         username_entry = Entry(window, cursor='dot', bd=1, width=27, font=("Arial", 30)) 
         username_entry.pack()
-        password_label = Label(window, text="Password : " , background="black", fg="green",font=("Arial", 30))
+        password_label = Label(window, text="Password : " , background="brown", fg="white",font=("Arial", 30))
         password_label.pack()
         password_entry = Entry(window, show='*', cursor='dot', bd=1, width=27, font=("Arial", 30))
         password_entry.pack()
-        email_label = Label(window, text="Email : ", background="black",  fg="green",font=("Arial", 30))
+        email_label = Label(window, text="Email : ", background="brown",  fg="white",font=("Arial", 30))
         email_label.pack()
         email_entry = Entry(window, cursor='dot', bd=1, width=27, font=("Arial", 30))
         email_entry.pack()
-        address_label = Label(window, text="Address : " ,fg="green" , background="black", font=("Arial", 30)) 
+        address_label = Label(window, text="Address : " ,fg="white" , background="brown", font=("Arial", 30)) 
         address_label.pack()
         address_entry = Entry(window, cursor='dot', bd=1, width=27, font=("Arial", 30))
         address_entry.pack()
-        phoneno_label = Label(window, text="Phone-no : ", fg="green",background="black", font=("Arial", 30))
+        phoneno_label = Label(window, text="Phone-no : ", fg="white",background="brown", font=("Arial", 30))
         phoneno_label.pack()
         phoneno_entry = Entry(window, cursor='dot', bd=1, width=27, font=("Arial", 30))
         phoneno_entry.pack(pady=20) 
-        register_button = Button(text="Register", font=("Arial", 20),bg="green", fg="black", command=lambda : d.register(username_entry.get(), password_entry.get(), email_entry.get(), address_entry.get(), phoneno_entry.get(), window))
+        register_button = Button(text="Register", font=("Arial", 20),bg="green", fg="white", command=lambda : d.register(username_entry.get(), password_entry.get(), email_entry.get(), address_entry.get(), phoneno_entry.get(), window))
         register_button.pack()
         back = Button(text="Back", bg="green", font=("Arial", 20),fg="black" ,command=lambda:back_login(window))
         back.pack()
@@ -83,6 +95,9 @@ class AddToolPage():
     def __init__(self):
         window = Tk()
         window.geometry('300x500')
+        img = Image.open('tool1.jpeg')
+        background_image = ImageTk.PhotoImage(image=img)
+        Label(window, image=background_image).place(x=0, y=0)
         tools_name_label = Label(window, font=("Arial", 25),text="Tool's name ")
         tools_name_label.grid(row=0, column=0)
         tools_name_entry = Entry(window, cursor='dot', bd=1, width=27, font=("Arial", 30))
@@ -107,27 +122,35 @@ class AddToolPage():
 def check(s):
     print(s)
 
+def add_page(window):
+    window.destroy()
+    a = AddToolPage()
+
 class DashBoard:
 
     def __init__(self):
         window = Tk()
         self.hirings = []
-        window.geometry("1100x600")
+        window.geometry("1200x1200")
         window.configure(bg="black")
+        img = Image.open('tool1.jpeg')
+        background_image = ImageTk.PhotoImage(image=img)
+        Label(window, image=background_image).place(x=0, y=0)
         # window.resizable(0, 0)
         self.searchEntry = Entry(window, cursor='dot', bd=1, width=27, font=("Arial", 30))
         self.searchEntry.place(x=280, y=80)
         self.searchButton = Button(window, text="Search", bg="green", padx=10, pady=11, command=lambda:t.view_and_hire(self.searchEntry.get(), window))
         self.searchButton.place(x=940, y=80)
-        self.add_button = Button(window,text="Add Tool", bg="green" ,command=lambda: print('dfd'))
+        self.add_button = Button(window,text="Add Tool", bg="green" ,command=lambda: add_page(window))
         self.add_button.place(x=500, y=170)
         self.viewbutton = Button(window, text="View Cart", bg="green",command=lambda: cart_page(window))
         self.viewbutton.place(x=400, y=170)
         self.viewbutton_ = Button(window, text="View Hired tools", bg="green",command=lambda: my_tools_page(window))
         self.viewbutton_.place(x=600, y=170)
+      
         scrollbar = Scrollbar(window)
         scrollbar.pack(side=RIGHT, fill=Y)
-        self.listbox = Listbox(window, bd=0 ,yscrollcommand=scrollbar.set, bg="black",font=("Arial", 20), fg="white", highlightcolor = 'green',justify='center')
+        self.listbox = Listbox(window, bd=0, yscrollcommand=scrollbar.set, bg="white",font=("Arial", 20), fg="black", highlightcolor = 'green', justify='center')
         self.listbox.bind('<<ListboxSelect>>', self.curSec)
         s =  t.get_tools(SESSION[0])
 
@@ -149,7 +172,10 @@ class MyToolsPage:
         window = Tk()
         self.returned = []
         window.configure(bg="black")
-        window.geometry("500x600")
+        window.geometry("800x600")
+        img = Image.open('tool1.jpeg')
+        background_image = ImageTk.PhotoImage(image=img)
+        Label(window, image=background_image).place(x=0, y=0)
         c.execute("""SELECT * FROM hirings WHERE username=?""",(SESSION[0],))
         a = c.fetchall()
         Label(window, text="HIRED TOOLS" , font=("Arial", 30), bg="black", fg="green").pack(pady=20)
@@ -320,10 +346,13 @@ class Hire:
 
     def __init__(self, tool_name, s):
         window = Tk()
-        window.configure(bg="black")
-        window.geometry("1100x600+100+50")
+        # window.configure(bg="black")
+        window.geometry("800x900")
         # label = Label(window, text=tool_name)
         # label.grid(row=0, column=0)
+        img = Image.open('tool1.jpeg')
+        background_image = ImageTk.PhotoImage(img)
+        Label(window, image=background_image).place(x=0, y=0)
         c.execute("""SELECT * FROM tools WHERE tool_name=?""", (tool_name,))
         a = c.fetchall()
         description_label = Label(window , text='Description -> ', font=("Arial", 25),bg="black", )
@@ -411,8 +440,11 @@ class Tools:
     
         window.destroy()
         window = Tk()
-        window.configure(bg="black")
-        window.geometry("500x600")
+        # window.configure(bg="black")
+        window.geometry("1000x1200")
+        img = Image.open('tool1.jpeg')
+        background_image = ImageTk.PhotoImage(img)
+        Label(window, image=background_image).place(x=0, y=0)
         quantity_label = Label(window, bg="black", fg="green" ,font=("Arial", 25),text="Quantity")
         quantity_label.pack(pady=7)
         quantity = Entry(window ,cursor='dot', bd=1, width=27, font=("Arial", 30) )
@@ -461,8 +493,11 @@ class CartPage:
 
     def __init__(self):
         window = Tk()
-        window.configure(bg="black")
-        window.geometry("500x600")
+        # window.configure(bg="black")
+        window.geometry("800x900")
+        img = Image.open('tool1.jpeg')
+        background_image = ImageTk.PhotoImage(img)
+        Label(window, image=background_image).place(x=0, y=0)
         cart_data = get_cart_data()
         for i in cart_data:
             label = Label(window, text="-->"+i[1], bg="black", fg="yellow" ,font=50)
@@ -477,8 +512,10 @@ class Invoice:
 
     def __init__(self, data):
         window = Tk()
-        window.config(bg="black")
-
+        # window.config(bg="black")
+        img = Image.open('tool1.jpeg')
+        background_image = PhotoImage.ImageTk(img)
+        Label(window, image=background_image).place(x=0, y=0)
         window.geometry("500x600")
         window.title('Invoice')
         Label(window, text="Description", font=("Arial", 20)).pack()
