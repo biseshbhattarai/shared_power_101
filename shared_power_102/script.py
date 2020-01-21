@@ -96,7 +96,7 @@ class AddToolPage():
         window = Tk()
         window.geometry('300x500')
         img = Image.open('tool1.jpeg')
-        background_image = ImageTk.PhotoImage(image=img)
+        background_image = ImageTk.PhotoImage(img)
         Label(window, image=background_image).place(x=0, y=0)
         tools_name_label = Label(window, font=("Arial", 25),text="Tool's name ")
         tools_name_label.grid(row=0, column=0)
@@ -132,9 +132,9 @@ class DashBoard:
         window = Tk()
         self.hirings = []
         window.geometry("1200x1200")
-        window.configure(bg="black")
+        # window.configure(bg="black")
         img = Image.open('tool1.jpeg')
-        background_image = ImageTk.PhotoImage(image=img)
+        background_image = ImageTk.PhotoImage(img)
         Label(window, image=background_image).place(x=0, y=0)
         # window.resizable(0, 0)
         self.searchEntry = Entry(window, cursor='dot', bd=1, width=27, font=("Arial", 30))
@@ -158,6 +158,9 @@ class DashBoard:
             self.listbox.insert(END, i[0])
         self.listbox.place(x=450, y=300)
         Button(window, text="Hire", bg="green", fg="black", font=40, command=lambda:t.confirm_hire(self.hirings, window)).place(x=535, y=620)
+        Button(window, text="Hire", bg="green", fg="black", font=40, 
+        command=lambda:t.insurance(self.hirings, window)).place(x=600, y=620)
+        Button(window, text="Hire", bg="green", fg="black", font=40, command=lambda:t.insurance(self.hirings, window)).place(x=700, y=620)
         window.mainloop()
 
   
@@ -171,10 +174,10 @@ class MyToolsPage:
     def __init__(self):
         window = Tk()
         self.returned = []
-        window.configure(bg="black")
+        # window.configure(bg="black")
         window.geometry("800x600")
         img = Image.open('tool1.jpeg')
-        background_image = ImageTk.PhotoImage(image=img)
+        background_image = ImageTk.PhotoImage(img)
         Label(window, image=background_image).place(x=0, y=0)
         c.execute("""SELECT * FROM hirings WHERE username=?""",(SESSION[0],))
         a = c.fetchall()
@@ -243,7 +246,7 @@ class Db:
             full_day_rate integer,
             description text,
             user_name text,
-            image text,
+            availability text,
             FOREIGN KEY(user_name) REFERENCES users(username)
             )""")
         except Exception as e:
@@ -254,9 +257,10 @@ class Db:
                 description text,
                 quantity integer,
                 price integer,
-                total integer,
                 delivery integer, 
-                insurance integer
+                insurance integer,
+                fine integer,
+                total integer
             )""")
         except Exception:
             pass
@@ -278,7 +282,7 @@ class Db:
                         tool_name text,
                         hired_date timestamp,
                         quantity integer,
-                        delivery text,
+                        delivery integer,
                         FOREIGN KEY(username) REFERENCES users(username),
                         FOREIGN KEY (tool_name) REFERENCES tools(tool_name)
                         
@@ -333,12 +337,14 @@ class Db:
 
     def add_tool(self,tool_name, description , half_day_rate, full_day_rate, window):
         if tool_name != '' and description != '' and half_day_rate != '' and full_day_rate != '':
-            command = """INSERT INTO tools VALUES(?,?,?,?,?)"""
-            c.execute(command, (tool_name, description, half_day_rate, full_day_rate, SESSION[0]))
+            command = """INSERT INTO tools VALUES(?,?,?,?,?,?)"""
+            c.execute(command, (tool_name, description, half_day_rate, full_day_rate, SESSION[0], 'True'))
             conn.commit()
             msg.showinfo('Success', 'Tool is added')
             window.destroy()
-            #GOTODASHBOARD
+            show_dashboard()
+        else:
+            msg.showerror('Error' , 'Empty fields')
     
 d = Db()
 
@@ -389,7 +395,7 @@ def hireandviewPage(tool_name, window, s):
 class Tools:
 
     def get_tools(self, username):
-        c.execute("""SELECT * FROM tools WHERE user_name != ?""", (username,))
+        c.execute("""SELECT * FROM tools WHERE user_name != ? and availabilty=?""", (username,'True'))
         return c.fetchall()
 
     def view_and_hire(self, tool_name, window):
@@ -412,6 +418,7 @@ class Tools:
     #HERE WE"LL UPDATE THE INVOICE 
     def hire_tools(self, cart_data, quantity,delivery,window):
         print(cart_data)
+        print(delivery)
         if delivery == 1:
             s = 'True'
         else:
@@ -436,6 +443,7 @@ class Tools:
         window.destroy()
         show_dashboard()
 
+
     def confirm_hire(self, data, window):
     
         window.destroy()
@@ -443,7 +451,7 @@ class Tools:
         # window.configure(bg="black")
         window.geometry("1000x1200")
         img = Image.open('tool1.jpeg')
-        background_image = ImageTk.PhotoImage(img)
+        background_image = ImageTk.PhotoImage(image=img)
         Label(window, image=background_image).place(x=0, y=0)
         quantity_label = Label(window, bg="black", fg="green" ,font=("Arial", 25),text="Quantity")
         quantity_label.pack(pady=7)
@@ -453,7 +461,8 @@ class Tools:
         delivery = IntVar()
         delivery_opt = Checkbutton(window, font=("Arial", 30),variable=delivery , text="Request for delivery")
         delivery_opt.pack()
-        Button(window, text="Confirm" , command=lambda: t.hire_tools(data, quantity.get(),delivery, window)).pack()
+        # price = t.get_price(tool_name)
+        Button(window, text="Confirm" , command=lambda: t.hire_tools(data, quantity.get(),delivery.get(), window)).pack()
         # t.hire_tools(data, quantity.get(), delivery_opt.get(), window)
      
 
@@ -463,25 +472,41 @@ class Tools:
         print(invoices)   
 
     def return_tools(self, tools):
+        fine = 0
         hiringgg = []
         for i in tools:
             c.execute("""SELECT * FROM hirings WHERE tool_name=? and username=? """, (i, SESSION[0]))
             a = c.fetchall()
             print(a)
-            c.execute("""SELECT * FROM tools WHERE tool_name=?""", (i))
+            c.execute("""SELECT * FROM tools WHERE tool_name=?""", (i, ))
             b = c.fetchall()
             print(b)
             half_day_rate = b[0][1]
             full_day_rate = b[0][2]
-            hiringgg.append((i, full_day_rate, a[0][3], full_day_rate*a[0][3]))
-        for i in hirings:
-            c.execute("""INSERT INTO INVOICE VALUES (?, ? , ?, ?)""", (i[0], i[1], i[2], i[3]))
+            date_now = datetime.datetime.now().strftime("%Y%m%d")
+            date_now = int(date_now)
+            if (date_now - a[0][2]) > 3:
+                fine = full_day_rate *2
+            else:
+                fine = 0
+            if (i[5]) == 'True':
+                delivery = 50
+            else:
+                delivery = 0   
+            hiringgg.append((i, full_day_rate, a[0][3], delivery , 5, fine , full_day_rate*a[0][3]+delivery+fine))
+            print(hiringgg)
+        for i in hiringgg:
+            c.execute("""INSERT INTO invoices VALUES (?, ? , ?, ?, ?, ?)""", (i[0], i[1], i[2], i[3],i[5], i[6]))
             conn.commit()
         # a = self.generate_invoice()
-        view_invoice_page(a , window)
+        t.view_invoice_page(a)
         
-
-
+    def insurance(self, tools_name, window):
+        #UPDATE AVAILABILTY TO FALSE
+        for i in tools_name:
+            c.execute("""UPDATE tools SET availability=? WHERE user_name=? and tool_name=?""",(SESSION[0], i))
+            conn.commit()
+            show_dashboard_(window)
 
 def get_cart_data():
     c.execute("""SELECT * FROM cart WHERE username=?""", (SESSION[0],))
@@ -514,7 +539,7 @@ class Invoice:
         window = Tk()
         # window.config(bg="black")
         img = Image.open('tool1.jpeg')
-        background_image = PhotoImage.ImageTk(img)
+        background_image = ImageTk.PhotoImage(img)
         Label(window, image=background_image).place(x=0, y=0)
         window.geometry("500x600")
         window.title('Invoice')
